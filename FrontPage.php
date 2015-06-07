@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', true);
 session_start();
-require_once('header.php');
+require('header.php');
 require_once('../../info/dbinfo.php');
 ?>
 
@@ -40,8 +40,10 @@ foreach ($productArray as $key => $product)
     $desc = $product['desc'];
     $price = "$" . $product['price'];
     $product['rating'] == NULL? $rating = "Not Yet Rated" : $rating = $product['rating'];
+
     echo "<tr><td rowspan=\"3\">
-    <form action=\"request.php\" method=\"POST\"><input type=\"hidden\" name=\"$id\" value=\"$price\"><button>Buy</button></form>
+    <form action=\"cart.php\" method=\"POST\"><input type=\"hidden\" name=\"product\" value=\"$id\">
+    <input type=\"hidden\" name=\"price\" value=\"$price\"><button>Buy</button></form>
     <th>$name<th rowspan=\"2\">$desc<tr><td><img src=\"$picPath\" width=\"100\" height=\"100\">
     <tr><th>$price<th>$rating<tr>";
 } 

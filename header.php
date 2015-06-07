@@ -1,15 +1,20 @@
+<?php
+  if(isset($_POST['logout']) && $_POST['logout'] == true)
+	{
+		foreach ($_SESSION as $key => $value) 
+		{
+			unset($_SESSION[$key]);
+		}
+		session_destroy();
+		header("Location: FrontPage.php");
+	}
+?>
 <div id="header">
 	<h1>Welcome to Sellit</h1>
 	<div id="headerLogin">
 
 		<?php
-			if(isset($_POST['logout']) && $_POST['logout'] == true)
-			{
-				unset($_SESSION['validUser']);
-				unset($_SESSION['validName']);
-				session_destroy();
-				echo "You have been logged out!";
-			}
+			
 			//if there is no user logged in, show the login fields
 			if(!isset($_SESSION['validUser']))
 			{ 
@@ -36,7 +41,7 @@
 			  {
 			    var pass=document.getElementById("password").value;
 			    var email= document.getElementById("email").value;
-			    makeRequest('request.php', email, pass); 
+			    makeRequest('test.php', email, pass); 
 			  }
 			};
 		})()
@@ -90,7 +95,9 @@ function makeRequest(url, email, pass)
     {
   	  if (httpRequest.status == 200) 
       {
+
       	var reply = JSON.parse(httpRequest.responseText);
+        alert(reply);
         //code 2 means the email is not in the database
 				if(reply['valid'] === 2)
 				{
@@ -104,13 +111,10 @@ function makeRequest(url, email, pass)
 					h2.appendChild(text2);
 					header.appendChild(h2);	
 				}
-				//code 1 means the email and password were found
+				//code 1 means the email and password were found, just reload the page to update the login heading
 				else if(reply['valid'] === 1)
 				{
-					var header = document.getElementById("header");
-					var message = document.createElement("h2");
-					message.appendChild(document.createTextNode("You have successfully logged in!"));
-					header.appendChild(message);
+					document.location.reload(true);
 				}
 				//code 0 means the email was found, but it's not the right password
 				else if(reply['valid'] === 0)

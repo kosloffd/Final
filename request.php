@@ -3,7 +3,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', true);
 session_start();
 header('Content-Type: text/html');
-require_once('../../info/dbinfo.php');
+require('../../info/dbinfo.php');
+require_once('header.php');
 
 $loginPage = 'http://web.engr.oregonstate.edu/~kosloffd/Final/FrontPage.php';
 $signUpPage = 'http://web.engr.oregonstate.edu/~kosloffd/Final/createAccount.html';
@@ -42,13 +43,12 @@ if($_SERVER['HTTP_REFERER'] == $loginPage)
 			addProduct($picPath, $name, $desc, $price);
 		}
 	}
+
 }
 
-//need a LOT more error checking here, but check if the request comes from the login page
+//If the request comes from the sign up page
 else if($_SERVER['HTTP_REFERER'] == $signUpPage)
 {
-	//filter and check errors here if you think of anything to filter
-
 	$fname = $_POST["fname"];
 	$lname = $_POST["lname"];
 	$email = $_POST["email"];
@@ -66,6 +66,7 @@ else if($_SERVER['HTTP_REFERER'] == $signUpPage)
 		}
 }
 
+//If the user is adding an address
 else if($_SERVER['HTTP_REFERER'] == $updateAddressPage)
 {
 	$street = $_POST['street'];
@@ -77,15 +78,13 @@ else if($_SERVER['HTTP_REFERER'] == $updateAddressPage)
 	submitAddress($street, $city, $state, $zip, $def);
 }
 
+//If the user has come here indirectly, not from a linked page
 else
 {
-	?>
-	<h2>You can't access this page without logging in first.</h2><br>
-	<h3>Click <a href="FrontPage.php">here</a> to go to the Front Page.<br>Just click the login button in the top right corner!</h3>
-
-<?php
-$ref = $_SERVER['HTTP_REFERER'];
-echo "$ref";
+	echo "<h2>You can't see this page without logging in first.</h2><br>
+	<h3>Just click the login button in the top right corner!</h3>";
+	$ref = $_SERVER['HTTP_REFERER'];
+	echo "$ref";
 }
 
 //This adds a user to the database, all fields are required
@@ -176,6 +175,7 @@ function validate($email, $pass)
 		$_SESSION['validUser']=$id;
 		$_SESSION['validName']=$name;
 		$stmt->close();
+		$mysqli->close();
 		return true;
 	}
 
@@ -238,7 +238,7 @@ function addProduct($picPath, $name, $desc, $price)
 
 	//Prepare
 	if(!($stmt = $mysqli->prepare("INSERT INTO product(picture_path, name, description, price)
-		VALUES(?,?,?,?)")))
+		VALUES(?,?,?,?);")))
 	{
 		echo "Couldn't prepare statement: (" . $mysqli->errno . ") " . $mysqli->error;
 	}
@@ -253,9 +253,10 @@ function addProduct($picPath, $name, $desc, $price)
 		echo "Couldn't execute 'Check whether email exists' statement: (" . $mysqli->errno . ") " . $mysqli->error;
 	}
 	$stmt->close();
+	$mysqli->close();
 }
 
-function getAddresses($userID)
+function getAddresses()
 {
 	global $dbURL;
   global $username;
@@ -273,6 +274,7 @@ function getAddresses($userID)
       echo "Couldn't prepare statement: (" . $mysqli->errno . ") " . $mysqli->error;
   }
   
+  $userID = $_SESSION['validUser'];
   //Bind
 	if(!$stmt->bind_param("s", $userID))
 	{
@@ -341,9 +343,7 @@ function submitAddress($street, $city, $state, $zip, $default)
 	}
 	$addressID = $mysqli->insert_id;
 	$userID = $_SESSION['validUser'];
-	echo "addressid: " . $addressID . "userid: " . $userID;
 	$secondquery = "INSERT INTO customer_address(fk_address_id, fk_customer_id) VALUES ('$addressID','$userID');";
-	echo $secondquery;
 
 	if(!($mysqli->real_query($secondquery)))
 	{
@@ -354,16 +354,36 @@ function submitAddress($street, $city, $state, $zip, $default)
 	$mysqli->close();
 }
 
-function purchaseItem($userID, $productID)
+function postReview($productID, $review, $rating)
 {
 
+	global $dbURL;
+	global $username;
+	global $password;
+	global $database;
+
+	$mysqli = new mysqli($dbURL, $username, $password, $database);
+	if($mysqli->connect_errno){echo "Failed to connect to MySQL: ".$mysqli->connect_error;}
+
+	//Prepare
+	if(!($stmt = $mysqli->prepare("INSERT INTO review(fk_customer_id, fk_product_id, review, rating) VALUES(?,?,?,?);")))
+	{
+		echo "Couldn't prepare statement: (" . $mysqli->errno . ") " . $mysqli->error;
+	}
+	$userID = $_SESSION['validUser'];
+	$review = my_sqli_real_escape_string(mysqli, $review);
+	//Bind
+	if(!$stmt->bind_param("iisi", $userID, $productID, $review, $rating))
+	{
+		echo "Couldn't bind parameters: (" . $mysqli->errno . ") " . $mysqli->error;
+	}
+	//Execute
+	if(!$stmt->execute())
+	{
+		echo "Couldn't execute 'Check whether email exists' statement: (" . $mysqli->errno . ") " . $mysqli->error;
+	}
+	$stmt->close();
+	$mysqli->close();
 }
-
-function postReview($userID, $productID, $review, $rating)
-{
-
-}
-
-
 
 ?>

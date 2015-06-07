@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<?php session_start();?>
+<title>Update your address</title>
+<form action="request.php" method="POST">
+	<fieldset id="addressBox">
+		<legend>Update your address</legend>
+			<label>Street Address:</label>
+			<input type="text" name="street">
+			<label>City:</label>
+			<input type="text" name="city">
+			<label>State:</label>
+			<input type="text" name="state">
+			<label>ZIP Code:</label>
+			<input type="number" name="zip">
+			<label>Default?<input type="checkbox" name="default" value="true"></label>
+			<button type="submit">Add</button>
+</fieldset>
+</form>

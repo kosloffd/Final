@@ -1,5 +1,4 @@
 <?php
-// session_start();
 require_once('../../info/dbinfo.php');
 ?>
 <!-- <form action="queries.php" method="POST">
@@ -73,7 +72,7 @@ function validate($email, $pass)
 	if($mysqli->connect_errno){echo "Failed to connect to MySQL: ".$mysqli->connect_error;}
 
 	//Prepare
-	if(!($stmt = $mysqli->prepare("SELECT COUNT(*), firstName FROM customer WHERE email = ? AND 
+	if(!($stmt = $mysqli->prepare("SELECT COUNT(*), id, firstName FROM customer WHERE email = ? AND 
 		password = ?")))
 	{
 		echo "Couldn't prepare statement: (" . $mysqli->errno . ") " . $mysqli->error;
@@ -93,20 +92,25 @@ function validate($email, $pass)
 
 	$total = 0;
 	$result = 0;
-	$name = NULL;
-	if(!($stmt->bind_result($result, $tmpname)))
+	$tmpname = null;
+	$tmpid = 0;
+	$id = 0;
+	$name = null;
+	if(!($stmt->bind_result($result, $id, $tmpname)))
 	{
 		echo "Couldn't bind the result (".$mysqli->errno.") ".$mysqli->error;
 	}
 	while($stmt->fetch())									//just get the count of names with that email (1 at most) and store it in $result
 	{
 		$total += $result;
+		$id = $tmpid;
 		$name = $tmpname;
 	}
 
 	if($total === 1)
 	{
-		$_SESSION['validUser']=$name;
+		$_SESSION['validUser']=$id;
+		$_SESSION['validName']=$name;
 		$stmt->close();
 		return true;
 	}

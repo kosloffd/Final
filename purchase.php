@@ -15,7 +15,7 @@ require_once('../../info/dbinfo.php');
 
 
 
-
+echo '<div class="bodyContent">';
 if((isset($_POST['checkout']) && count(getAddresses()) == 0) || isset($_POST['addAddress']))
 {			
 	//boolean, whether to show an input form on the page
@@ -42,7 +42,7 @@ if((isset($_POST['checkout']) && count(getAddresses()) == 0) || isset($_POST['ad
 		else
 		{
 			submitAddress($street, $city, $state, $zip, $default);
-			header("refresh:3");
+			echo '<script type="text/javascript">location.reload();<\script>';
 		}
 	}
 
@@ -108,7 +108,7 @@ else if((isset($_POST['finalCheckout'])))
 	}
 }
 
-
+echo "</div>";
 
 
 function makePurchase($productArray)
@@ -241,5 +241,6 @@ function submitAddress($street, $city, $state, $zip, $default)
 	$stmt->close();
 	$mysqli->close();
 }
+
 
 ?>

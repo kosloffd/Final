@@ -5,7 +5,7 @@ session_start();
 require_once('header.php');
 require_once('../../info/dbinfo.php');
 
-
+echo '<div class="bodyContent">';
 $loginPage = 'http://web.engr.oregonstate.edu/~kosloffd/Final/FrontPage.php';
 $thisPage = 'http://web.engr.oregonstate.edu/~kosloffd/Final/cart.php';
 
@@ -91,39 +91,8 @@ else
 	$ref = $_SERVER['HTTP_REFERER'];
 	echo "$ref";
 }
+echo "</div>";
 
-function makePurchase($productArray)
-{
-
-	global $dbURL;
-  global $username;
-  global $password;
-  global $database;
-
-  $mysqli = new mysqli($dbURL, $username, $password, $database);
-  if($mysqli->connect_errno){echo "Failed to connect to MySQL: ".$mysqli->connect_error;}
-  
-  //Don't need prepared statements, because the data comes from the website
-	$userID = $_SESSION['validUser'];
-	$orderQuery = "INSERT INTO order(fk_customer_id) VALUES ('$userID');";
-	if(!($mysqli->real_query($orderQuery)))
-	{
-		echo "Couldn't update the order table.(" . $mysqli->errno . ") " . $mysqli->error;
-	}
-
-	//now update the many-to-many table
-	$orderID = $mysqli->insert_id;
-	foreach ($$productArray as $key => $value) 
-	{
-		$orderProductQuery = "INSERT INTO order(fk_order_id, fk_product_id, quantity) VALUES ('$orderID','$key', '$value');";
-
-		if(!($mysqli->real_query($orderProductQuery)))
-		{
-			echo "Error updating the order_product table at product value $key(" . $mysqli->errno . ") " . $mysqli->error;
-		}
-	}
-	$mysqli->close();
-}
 
 //Returns the path of the picture
 function getPicPath($productID)			//might not be correct

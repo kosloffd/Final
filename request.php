@@ -29,7 +29,7 @@ if($_SERVER['HTTP_REFERER'] == $loginPage || $_SERVER['HTTP_REFERER'] == $cartPa
 	}
 
 	//if the admin is uploading a file 
-	else if($_SESSION['validUser'] ==="admin" && isset($_FILES['uploadPic']['name']))
+	else if($_SESSION['validUser'] == "14" && isset($_FILES['uploadPic']['name']))
 	{
 		$uploadfile = $uploadDir . basename($_FILES['uploadPic']['name']);	
 		if(move_uploaded_file($_FILES['uploadPic']['tmp_name'], $uploadfile))
@@ -249,6 +249,7 @@ function addProduct($picPath, $name, $desc, $price)
 	}
 	$stmt->close();
 	$mysqli->close();
+	header("Location:FrontPage.php");
 }
 
 function getAddresses()

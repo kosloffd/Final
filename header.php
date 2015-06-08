@@ -10,24 +10,25 @@
 	}
 ?>
 <div id="header">
+	<link rel="stylesheet" href="style.css">
 	<h1>Welcome to Sellit</h1>
-	<div id="headerLogin">
+	<div class="headerLogin">
 
 		<?php
 			
 			//if there is no user logged in, show the login fields
 			if(!isset($_SESSION['validUser']))
 			{ 
-		?>
-				<label>Email:
+		?><ul>
+				<li><label>Email:
 				<input type="text" id="email" required/></label>
-				<label>Password:
+				<li><label>Password:
 				<input type="password" id="password" required/></label>
-				<span type="button" id="loginButton" style="cursor: pointer; text-decoration: underline">
+				</ul>
+			<div id="headerButtons"><span type="button" id="loginButton" style="cursor: pointer; text-decoration: underline">
 				  login
 				</span>
-	</div>
-	<p>or <a href="createAccount.html">signup</a></p>
+	<p>or <a href="createAccount.html">signup</a></p></div></div></div>
 	
 	<script type="text/javascript">	(function addButtonAction()
 		{

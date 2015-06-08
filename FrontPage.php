@@ -10,21 +10,23 @@ require_once('../../info/dbinfo.php');
 
 <!--This appears only for admin, plus other info to POST over to request.php, which will
 upload the file and call addProduct($filepath, ...)-->
-
+<div id="orders"></div>
+<div class="bodyContent">
 <?php 
-//The admin account id is 14, pass: BrokenPlane
+//The admin account is admin@osu.edu, pass: BrokenPlane
 if(isset($_SESSION['validUser']) && $_SESSION['validUser'] == '14')
 { 
 ?>
-
+<div id="uploadDiv">
 <form enctype="multipart/form-data" action="request.php" method="POST">
-    <input type="hidden" name="MAX_FILE_SIZE" value="500000">
+    <input type="hidden" name="MAX_FILE_SIZE" value="5000000">
     Image: <input name="uploadPic" type="file" >
     Title: <input type="text" name="name">
-    Description: <input type="textarea" name="desc">
+    Description: <input type="textarea" rows="4" cols="50" name="desc">
     Price: <input type="number" step="0.01" name="price">
     <input type="submit" value="Upload" >
 </form>
+</div>
 
 <?php 
  }
@@ -92,8 +94,7 @@ function getAllProducts()
     return $products;
 }
 ?>
-
-<script type="text/javascript"></script>
+</div>
 
 
 

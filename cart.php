@@ -2,9 +2,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors', true);
 session_start();
-header('Content-Type: text/html');
-require('../../info/dbinfo.php');
 require_once('header.php');
+require_once('../../info/dbinfo.php');
+
 
 $loginPage = 'http://web.engr.oregonstate.edu/~kosloffd/Final/FrontPage.php';
 $thisPage = 'http://web.engr.oregonstate.edu/~kosloffd/Final/cart.php';
@@ -16,11 +16,8 @@ if($_SERVER['HTTP_REFERER'] == $loginPage || $_SERVER['HTTP_REFERER'] == $thisPa
 	{
 		$productID = $_POST["product"];
 		$price = $_POST["price"];
-		// unset($_POST["product"]);				Not sure if I need this so when the page refreshes it doesn't post again
-		// unset($_POST["price"]);			
-		
-		//if they haven't  logged in, they'll need to do that
-			//maybe put productID in local storage so that when they refresh the page it gets added back in to the cart
+
+		//If they're logged in
 		if(isset($_SESSION['validUser']))
 		{
 
@@ -49,26 +46,35 @@ if($_SERVER['HTTP_REFERER'] == $loginPage || $_SERVER['HTTP_REFERER'] == $thisPa
 					$_SESSION['cart'] = $newCart;
 				}
 			}
-
+			//If they've just hit the 'remove from cart button'
 			else if(isset($_POST['remove']))
 			{
 				$idToRemove = $_POST['remove'];
 				unset($_SESSION['cart'][$idToRemove]);
+				if(count($_SESSION['cart']) == 0)
+				{
+					unset($_SESSION['cart']);
+				}
 			}
-
-			//Display the items in the cart
-			echo 
-			"<table id=\"cartTable\">
-			<thead>
-			<tr colspan=\"3\"><th>Items in your cart</th></thead>
-			<tbody>";
 			
-			foreach ($_SESSION['cart'] as $key => $value) 
+			//Display the items in the cart if there is one (there may not be if they just removed an item and emptied it)
+			if(isset($_SESSION['cart']))
 			{
-				echo "<tr><td><img src=\"getPicPath($key)\" width=\"100\" height=\"100\"><td>\<label>\"Quantity: \"</label>$value<td>
-				<form method=\"POST\"><input type=\"hidden\" name=\"remove\" value=\"$key\"><button>Remove from cart</button>";
+				echo 
+				"<form action=\"purchase.php\"method=\"POST\" ><input type=\"hidden\" name=\"checkout\" value=\"true\"><button>Checkout Now<button></form>
+				<table id=\"cartTable\">
+				<thead>
+				<tr colspan=\"3\"><th>Items in your cart:</th></thead>
+				<tbody>";
+				
+				foreach ($_SESSION['cart'] as $key => $value) 
+				{
+					$path = getPicPath($key);
+					echo "<tr><td><img src=\"$path\" width=\"100\" height=\"100\"><td><label>Quantity: </label>$value<td>
+					<form method=\"POST\"><input type=\"hidden\" name=\"remove\" value=\"$key\"><button>Remove from cart</button>";
+				}
+				echo "</tbody></table>";
 			}
-			echo "</tbody></table>";
 		}	
 		
 		else
@@ -131,16 +137,12 @@ function getPicPath($productID)			//might not be correct
   if($mysqli->connect_errno){echo "Failed to connect to MySQL: ".$mysqli->connect_error;}
   
   //Don't need prepared statements, because the data comes from the website
-	$orderQuery = "SELECT picture_path FROM product WHERE id = '$productID';";
+	$query = "SELECT picture_path FROM product WHERE id = $productID;";
 	$result =null;
-	if(!($result = $mysqli->real_query($orderQuery)))
-	{
-		echo "Couldn't update the order table.(" . $mysqli->errno . ") " . $mysqli->error;
-	}
-	$pathArray = ($result->fetch_all());
-	$path = $pathArray[0][0];
-	$mysqli->close();
-	return $path;
+	$mysqli->real_query($query);
+	$result = $mysqli->use_result();
+	$path = $result->fetch_row();
+	return $path[0];
 }
 
 ?>

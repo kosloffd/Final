@@ -4,14 +4,14 @@ ini_set('display_errors', true);
 session_start();
 header('Content-Type: text/html');
 require('../../info/dbinfo.php');
-require_once('header.php');
 
+$cartPage	= 'http://web.engr.oregonstate.edu/~kosloffd/Final/cart.php';
 $loginPage = 'http://web.engr.oregonstate.edu/~kosloffd/Final/FrontPage.php';
 $signUpPage = 'http://web.engr.oregonstate.edu/~kosloffd/Final/createAccount.html';
 $uploadDir = '/nfs/stak/students/k/kosloffd/public_html/Final/images/';
 $updateAddressPage = 'http://web.engr.oregonstate.edu/~kosloffd/Final/updateAddress.html';
 
-if($_SERVER['HTTP_REFERER'] == $loginPage)
+if($_SERVER['HTTP_REFERER'] == $loginPage || $_SERVER['HTTP_REFERER'] == $cartPage)
 {
 	//If the user is logging in
 	if(isset($_POST["pass"]) && isset($_POST["email"]))
@@ -25,7 +25,6 @@ if($_SERVER['HTTP_REFERER'] == $loginPage)
 		else if(validate($email, $pass))
 			{ $response['valid'] = 1; }
 		else{ $response['valid'] = 0; }
-
 		echo json_encode($response);
 	}
 
@@ -43,7 +42,6 @@ if($_SERVER['HTTP_REFERER'] == $loginPage)
 			addProduct($picPath, $name, $desc, $price);
 		}
 	}
-
 }
 
 //If the request comes from the sign up page
@@ -81,10 +79,7 @@ else if($_SERVER['HTTP_REFERER'] == $updateAddressPage)
 //If the user has come here indirectly, not from a linked page
 else
 {
-	echo "<h2>You can't see this page without logging in first.</h2><br>
-	<h3>Just click the login button in the top right corner!</h3>";
-	$ref = $_SERVER['HTTP_REFERER'];
-	echo "$ref";
+	header("Location:FrontPage.php");
 }
 
 //This adds a user to the database, all fields are required
@@ -304,7 +299,6 @@ function getAddresses()
   }
 
   $stmt->close();
-  $mysqli->close();
   return $addresses;
 }
 

@@ -41,7 +41,7 @@
 			  {
 			    var pass=document.getElementById("password").value;
 			    var email= document.getElementById("email").value;
-			    makeRequest('test.php', email, pass); 
+			    makeRequest('request.php', email, pass); 
 			  }
 			};
 		})()
@@ -95,9 +95,7 @@ function makeRequest(url, email, pass)
     {
   	  if (httpRequest.status == 200) 
       {
-
       	var reply = JSON.parse(httpRequest.responseText);
-        alert(reply);
         //code 2 means the email is not in the database
 				if(reply['valid'] === 2)
 				{
